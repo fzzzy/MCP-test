@@ -1,1 +1,11 @@
-This repository is empty. Any task executed on it should be considered a new capability and needs to be created.
+# MCP Test
+
+This repository contains a simple Python script that prints "Hello, World!".
+
+## How to run
+
+To run the `main.py` file, use the following command:
+
+```sh
+python main.py
+```
