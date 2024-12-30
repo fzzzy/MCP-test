@@ -1,11 +1,4 @@
 # MCP Test
 
-This repository contains a simple Python script that prints "Hello, World!".
+This repo contains the claude mcp client tutorial, modified to cleanly exit on Ctrl-C.
 
-## How to run
-
-To run the `main.py` file, use the following command:
-
-```sh
-python main.py
-```

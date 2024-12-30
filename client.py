@@ -6,6 +6,7 @@ from contextlib import AsyncExitStack
 
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
+import signal
 
 from anthropic import Anthropic
 from dotenv import load_dotenv
@@ -124,7 +125,19 @@ class MCPClient:
         
         while True:
             try:
-                query = input("\nQuery: ").strip()
+                # One could also setitimer here to time out
+                # after user inactivity, if desired
+                try:
+                    # input blocks, so technically it is a really bad idea
+                    # to do this in an async function, but it works
+                    query = input("\nQuery: ").strip()
+                except EOFError:
+                    print()
+                    break
+                except TimeoutError:
+                    print()
+                    signal.setitimer(signal.ITIMER_REAL, 0) # cancel timer
+                    break
                 
                 if query.lower() == 'quit':
                     break
@@ -144,6 +157,15 @@ class MCPClient:
 
 
 async def main():
+    def interrupt(_signal, _frame):
+        signal.setitimer(signal.ITIMER_REAL, 0.001) # 1 ms
+    # Register the custom signal handler for SIGINT (Ctrl+C)
+    signal.signal(signal.SIGINT, interrupt)
+
+    def timeout(_signal, _frame):
+        raise TimeoutError()
+    signal.signal(signal.SIGALRM, timeout)
+
     if len(sys.argv) < 2:
         print("Usage: python client.py <path_to_server_script>")
         sys.exit(1)
